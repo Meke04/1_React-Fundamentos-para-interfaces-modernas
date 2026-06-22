@@ -1,11 +1,8 @@
 import Produto from './components/Produto';
-import img1 from './assets/download.jpg';
-import img2 from './assets/download (1).jpg';
-import img3 from './assets/download (2).jpg';
 import { useEffect, useState } from 'react';
+import './App.css';
 
-
-const API_URL = 'https://crudcrud.com/api/ec0084b259914ff1845cc85ed0cf69b8/produtos';
+const API_URL = 'https://crudcrud.com/api/42520a2872cd4fbfb093f23ee91a4898/produtos';
 
 
 
@@ -19,54 +16,58 @@ function App() {
      sobre:"",
      preco:"",
   }); 
+  const [carregando, setCarregando] = useState(true);
 
   useEffect(() =>{
+     setCarregando(true);
+
     fetch(API_URL)
     .then(res => res.json())
     .then(dados => setProdutos(dados))
     .catch(error => console.error("Erro ao buscar produtos:",error))
-  },[])
-  
-  
+    .finally(() => {
+       setTimeout(() => {
+        setCarregando(false);
+      }, 3000);
+    })
+  },[]);  
   const handleSubmit = (e) => {
 
     e.preventDefault();
 
     if (!novoProduto.img || novoProduto.nome.trim() === '' || novoProduto.sobre.trim() === '' || novoProduto.preco.trim() === '') return;
-    
-    const nova = {
-      img: URL.createObjectURL(novoProduto.img),
-      nome: novoProduto.nome,
-      sobre: novoProduto.sobre,
-      preco: novoProduto.preco,
-    }
-    fetch(API_URL, {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify(nova)
-    })
-    .then(res => res.json())
-    .then(produtoCriado => {
-      setProdutos([...produtos, produtoCriado]);
-      setNovoProduto({
-        img: null,
-        nome:"",
-        sobre:"",
-        preco:"",
-      });
-    })
-    .catch(error => console.error("Erro ao buscar produtos:",error))
-  
-  
-  }
 
+      const nova = {
+        img: novoProduto.img,
+        nome: novoProduto.nome,
+        sobre: novoProduto.sobre,
+        preco: novoProduto.preco,
+      };
+      fetch(API_URL, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(nova)
+      })
+      .then(res => res.json())
+      .then(produtoCriado => {
+        setProdutos([...produtos, produtoCriado]);
+        setNovoProduto({
+          img: null,
+          nome:"",
+          sobre:"",
+          preco:"",
+        });   
+      })
+      .catch(error => console.error("Erro ao buscar produtos:",error))
+  }
 
   return (
     
     <main>
       <form onSubmit={handleSubmit}>
-        <input type='file' accept="image/*"
-          onChange={(e) => setNovoProduto({...novoProduto, img: e.target.files[0]})}
+        <input type='text' placeholder='URL da imagem'
+          value={novoProduto.img}
+          onChange={(e) => setNovoProduto({...novoProduto, img: e.target.value})}
         />
         <input type='text' placeholder='Digite o nome do item'
           value={novoProduto.nome}
@@ -82,9 +83,13 @@ function App() {
         />
         <button type='submit'>Adcionar</button>
       </form>
-      <section>
-        {produtos.map(produto => <Produto key={produto._id} img={produto.img} nome={produto.nome} sobre={produto.sobre} preco={produto.preco} />)}
-      </section>
+      {carregando ? (
+        <p className='loading'>Carregando produtos...</p>
+      ) : (
+        <section>
+          {produtos.map(produto => <Produto key={produto._id} img={produto.img} nome={produto.nome} sobre={produto.sobre} preco={produto.preco} />)}
+        </section>
+      )}
     </main> 
   )
 }

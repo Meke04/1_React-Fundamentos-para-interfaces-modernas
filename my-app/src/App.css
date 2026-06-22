@@ -1,0 +1,43 @@
+section {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+}
+form {
+    width: 400px;
+    margin: 30px auto;
+
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+form input {
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+}
+form button {
+    padding: 10px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+}
+main {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+.loading {
+    text-align: center;
+    font-size: 24px;
+    font-weight: bold;
+    margin-top: 40px;
+
+    animation: piscar 1s infinite;
+}
+
+@keyframes piscar {
+    50% {
+        opacity: 0.5;
+    }
+}
